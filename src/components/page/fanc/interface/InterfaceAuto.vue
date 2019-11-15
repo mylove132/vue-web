@@ -9,80 +9,88 @@
             </el-breadcrumb>
         </div>
         <div class="container">
-            <div class="handle-box">
-                <el-button
-                        type="primary"
-                        icon="el-icon-delete"
-                        class="handle-del mr10"
-                        @click="delAllSelection"
-                >批量删除</el-button>
-                <el-select v-model="query.address" placeholder="地址" class="handle-select mr10">
-                    <el-option key="1" label="广东省" value="广东省"></el-option>
-                    <el-option key="2" label="湖南省" value="湖南省"></el-option>
-                </el-select>
-                <el-input v-model="query.name" placeholder="用户名" class="handle-input mr10"></el-input>
-                <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
-                <router-link to="/interfaceauto_add"><el-button type="primary" icon="el-icon-plus" style="margin-left: 10px">添加</el-button></router-link>
-            </div>
-            <el-table
-                    :data="tableData"
-                    border
-                    class="table"
-                    ref="multipleTable"
-                    header-cell-class-name="table-header"
-                    @selection-change="handleSelectionChange"
-            >
-                <el-table-column type="selection" width="55" align="center"></el-table-column>
-                <el-table-column prop="id" label="ID" width="55" align="center"></el-table-column>
-                <el-table-column prop="name" label="用户名"></el-table-column>
-                <el-table-column label="账户余额">
-                    <template slot-scope="scope">￥{{scope.row.money}}</template>
-                </el-table-column>
-                <el-table-column label="头像(查看大图)" align="center">
-                    <template slot-scope="scope">
-                        <el-image
-                                class="table-td-thumb"
-                                :src="scope.row.thumb"
-                                :preview-src-list="[scope.row.thumb]"
-                        ></el-image>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="address" label="地址"></el-table-column>
-                <el-table-column label="状态" align="center">
-                    <template slot-scope="scope">
-                        <el-tag
-                                :type="scope.row.state==='成功'?'success':(scope.row.state==='失败'?'danger':'')"
-                        >{{scope.row.state}}</el-tag>
-                    </template>
-                </el-table-column>
-
-                <el-table-column prop="date" label="注册时间"></el-table-column>
-                <el-table-column label="操作" width="180" align="center">
-                    <template slot-scope="scope">
+            <el-row>
+                <el-col :span="4" class="icon-warp">
+                    <Tree :data="dirData" :render="renderContent" style="background: #f4f4f4"></Tree>
+                </el-col>
+                <el-col :span="18" style="margin-left: 40px">
+                    <div class="handle-box">
                         <el-button
-                                type="text"
-                                icon="el-icon-edit"
-                                @click="handleEdit(scope.$index, scope.row)"
-                        >编辑</el-button>
-                        <el-button
-                                type="text"
+                                type="primary"
                                 icon="el-icon-delete"
-                                class="red"
-                                @click="handleDelete(scope.$index, scope.row)"
-                        >删除</el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
-            <div class="pagination">
-                <el-pagination
-                        background
-                        layout="total, prev, pager, next"
-                        :current-page="query.pageIndex"
-                        :page-size="query.pageSize"
-                        :total="pageTotal"
-                        @current-change="handlePageChange"
-                ></el-pagination>
-            </div>
+                                class="handle-del mr10"
+                                @click="delAllSelection"
+                        >批量删除</el-button>
+                        <el-select v-model="query.address" placeholder="地址" class="handle-select mr10">
+                            <el-option key="1" label="广东省" value="广东省"></el-option>
+                            <el-option key="2" label="湖南省" value="湖南省"></el-option>
+                        </el-select>
+                        <el-input v-model="query.name" placeholder="用户名" class="handle-input mr10"></el-input>
+                        <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+                        <router-link to="/interfaceauto_add"><el-button type="primary" icon="el-icon-plus" style="margin-left: 10px">添加</el-button></router-link>
+                    </div>
+                    <el-table
+                            :data="tableData"
+                            border
+                            class="table"
+                            ref="multipleTable"
+                            header-cell-class-name="table-header"
+                            @selection-change="handleSelectionChange"
+                    >
+                        <el-table-column type="selection" width="55" align="center"></el-table-column>
+                        <el-table-column prop="id" label="ID" width="55" align="center"></el-table-column>
+                        <el-table-column prop="name" label="用户名"></el-table-column>
+                        <el-table-column label="账户余额">
+                            <template slot-scope="scope">￥{{scope.row.money}}</template>
+                        </el-table-column>
+                        <el-table-column label="头像(查看大图)" align="center">
+                            <template slot-scope="scope">
+                                <el-image
+                                        class="table-td-thumb"
+                                        :src="scope.row.thumb"
+                                        :preview-src-list="[scope.row.thumb]"
+                                ></el-image>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="address" label="地址"></el-table-column>
+                        <el-table-column label="状态" align="center">
+                            <template slot-scope="scope">
+                                <el-tag
+                                        :type="scope.row.state==='成功'?'success':(scope.row.state==='失败'?'danger':'')"
+                                >{{scope.row.state}}</el-tag>
+                            </template>
+                        </el-table-column>
+
+                        <el-table-column prop="date" label="注册时间"></el-table-column>
+                        <el-table-column label="操作" width="180" align="center">
+                            <template slot-scope="scope">
+                                <el-button
+                                        type="text"
+                                        icon="el-icon-edit"
+                                        @click="handleEdit(scope.$index, scope.row)"
+                                >编辑</el-button>
+                                <el-button
+                                        type="text"
+                                        icon="el-icon-delete"
+                                        class="red"
+                                        @click="handleDelete(scope.$index, scope.row)"
+                                >删除</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <div class="pagination">
+                        <el-pagination
+                                background
+                                layout="total, prev, pager, next"
+                                :current-page="query.pageIndex"
+                                :page-size="query.pageSize"
+                                :total="pageTotal"
+                                @current-change="handlePageChange"
+                        ></el-pagination>
+                    </div>
+                </el-col>
+            </el-row>
+
         </div>
 
         <!-- 编辑弹出框 -->
@@ -114,6 +122,86 @@
                     name: '',
                     pageIndex: 1,
                     pageSize: 10
+                },
+                dirData:[
+                    {
+                        title: 'parent 1',
+                        expand: true,
+                        render: (h, { root, node, data }) => {
+                            return h('span', {
+                                style: {
+                                    display: 'inline-block',
+                                    width: '100%'
+                                }
+                            }, [
+                                h('span', [
+                                    h('Icon', {
+                                        props: {
+                                            type: 'ios-folder-outline'
+                                        },
+                                        style: {
+                                            marginRight: '8px'
+                                        }
+                                    }),
+                                    h('span', data.title)
+                                ]),
+                                h('span', {
+                                    style: {
+                                        display: 'inline-block',
+                                        float: 'right',
+                                        marginRight: '32px'
+                                    }
+                                }, [
+                                    h('Button', {
+                                        props: Object.assign({}, this.buttonProps, {
+                                            icon: 'ios-add',
+                                            type: 'primary'
+                                        }),
+                                        style: {
+                                            width: '64px'
+                                        },
+                                        on: {
+                                            click: () => { this.append(data) }
+                                        }
+                                    })
+                                ])
+                            ]);
+                        },
+                        children: [
+                            {
+                                title: 'child 1-1',
+                                expand: true,
+                                children: [
+                                    {
+                                        title: 'leaf 1-1-1',
+                                        expand: true
+                                    },
+                                    {
+                                        title: 'leaf 1-1-2',
+                                        expand: true
+                                    }
+                                ]
+                            },
+                            {
+                                title: 'child 1-2',
+                                expand: true,
+                                children: [
+                                    {
+                                        title: 'leaf 1-2-1',
+                                        expand: true
+                                    },
+                                    {
+                                        title: 'leaf 1-2-1',
+                                        expand: true
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                buttonProps: {
+                    type: 'default',
+                    size: 'small',
                 },
                 tableData: [],
                 multipleSelection: [],
@@ -184,6 +272,67 @@
             handlePageChange(val) {
                 this.$set(this.query, 'pageIndex', val);
                 this.getData();
+            },
+            renderContent (h, { root, node, data }) {
+                return h('span', {
+                    style: {
+                        display: 'inline-block',
+                        width: '100%'
+                    }
+                }, [
+                    h('span', [
+                        h('Icon', {
+                            props: {
+                                type: 'ios-paper-outline'
+                            },
+                            style: {
+                                marginRight: '8px'
+                            }
+                        }),
+                        h('span', data.title)
+                    ]),
+                    h('span', {
+                        style: {
+                            display: 'inline-block',
+                            float: 'right',
+                            marginRight: '32px'
+                        }
+                    }, [
+                        h('Button', {
+                            props: Object.assign({}, this.buttonProps, {
+                                icon: 'ios-add'
+                            }),
+                            style: {
+                                marginRight: '8px'
+                            },
+                            on: {
+                                click: () => { this.append(data) }
+                            }
+                        }),
+                        h('Button', {
+                            props: Object.assign({}, this.buttonProps, {
+                                icon: 'ios-remove'
+                            }),
+                            on: {
+                                click: () => { this.remove(root, node, data) }
+                            }
+                        })
+                    ])
+                ]);
+            },
+            append (data) {
+                const children = data.children || [];
+                children.push({
+                    title: 'appended node',
+                    expand: true
+                });
+                this.$set(data, 'children', children);
+            },
+            remove (root, node, data) {
+                const parentKey = root.find(el => el === node).parent;
+                const parent = root.find(el => el.nodeKey === parentKey).node;
+                const index = parent.children.indexOf(data);
+                parent.children.splice(index, 1);
             }
         }
     };
@@ -217,5 +366,8 @@
         margin: auto;
         width: 40px;
         height: 40px;
+    }
+    .icon-warp{
+        font-size: 20px;
     }
 </style>

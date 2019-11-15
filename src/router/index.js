@@ -40,6 +40,11 @@ export default new Router({
                     meta: { title: '接口自动化用例' }
                 },
                 {
+                    path: '/webauto',
+                    component: () => import(/* webpackChunkName: "form" */ '../components/page/fanc/web/WebViewAdd.vue'),
+                    meta: { title: 'web UI自动化用例' }
+                },
+                {
                     path: '/interfaceauto_add',
                     component: () => import(/* webpackChunkName: "form" */ '../components/page/fanc/interface/InterfaceAutoAdd.vue'),
                     meta: { title: '添加接口自动化用例' }

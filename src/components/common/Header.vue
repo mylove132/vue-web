@@ -1,11 +1,56 @@
 <template>
     <div class="header">
-        <!-- 折叠按钮 -->
-        <div class="collapse-btn" @click="collapseChage">
-            <i v-if="!collapse" class="el-icon-s-fold"></i>
-            <i v-else class="el-icon-s-unfold"></i>
+        <div class="logo" style="margin-left: 20px">后台管理系统</div>
+        <div>
+            <div style="float: left">
+                <el-menu
+                        :default-active="onRoutes"
+                        background-color="#545c64"
+                        text-color="#fff"
+                        active-text-color="#ffd04b"
+                        unique-opened
+                        class="el-menu-demo"
+                        mode="horizontal"
+                        router
+                >
+                    <template v-for="item in items">
+                        <template v-if="item.subs">
+                            <el-submenu :index="item.index" :key="item.index" >
+                                <template slot="title">
+                                    <i :class="item.icon"></i>
+                                    <span slot="title">{{ item.title }}</span>
+                                </template>
+                                <template v-for="subItem in item.subs">
+                                    <el-submenu
+                                            v-if="subItem.subs"
+                                            :index="subItem.index"
+                                            :key="subItem.index"
+                                    >
+                                        <template slot="title">{{ subItem.title }}</template>
+                                        <el-menu-item
+                                                v-for="(threeItem,i) in subItem.subs"
+                                                :key="i"
+                                                :index="threeItem.index"
+                                        >{{ threeItem.title }}</el-menu-item>
+                                    </el-submenu>
+                                    <el-menu-item
+                                            v-else
+                                            :index="subItem.index"
+                                            :key="subItem.index"
+                                    >{{ subItem.title }}</el-menu-item>
+                                </template>
+                            </el-submenu>
+                        </template>
+                        <template v-else>
+                            <el-menu-item :index="item.index" :key="item.index">
+                                <i :class="item.icon"></i>
+                                <span slot="title">{{ item.title }}</span>
+                            </el-menu-item>
+                        </template>
+                    </template>
+                </el-menu>
+            </div>
         </div>
-        <div class="logo">后台管理系统</div>
         <div class="header-right">
             <div class="header-user-con">
                 <!-- 全屏显示 -->
@@ -56,13 +101,97 @@
                 collapse: false,
                 fullscreen: false,
                 name: 'linxin',
-                message: 2
+                message: 2,
+                items: [
+                    {
+                        icon: 'el-icon-lx-cascades',
+                        index: 'table',
+                        title: '基础表格'
+                    },
+                    {
+                        icon: 'el-icon-lx-copy',
+                        index: 'tabs',
+                        title: 'tab选项卡'
+                    },
+                    {
+                        icon: 'el-icon-lx-calendar',
+                        index: '3',
+                        title: '自动化用例',
+                        subs: [
+                            {
+                                index: 'interfaceauto',
+                                title: '接口自动化用例'
+                            },
+                            {
+                                index: 'appauto',
+                                title: 'APP自动化用例'
+                            },
+                            {
+                                index: 'webauto',
+                                title: 'WEB自动化用例'
+                            }
+                        ]
+                    },
+                    {
+                        icon: 'el-icon-lx-emoji',
+                        index: 'icon',
+                        title: '自定义图标'
+                    },
+                    {
+                        icon: 'el-icon-pie-chart',
+                        index: 'charts',
+                        title: 'schart图表'
+                    },
+                    {
+                        icon: 'el-icon-rank',
+                        index: '6',
+                        title: '拖拽组件',
+                        subs: [
+                            {
+                                index: 'drag',
+                                title: '拖拽列表'
+                            },
+                            {
+                                index: 'dialog',
+                                title: '拖拽弹框'
+                            }
+                        ]
+                    },
+                    {
+                        icon: 'el-icon-lx-global',
+                        index: 'i18n',
+                        title: '国际化功能'
+                    },
+                    {
+                        icon: 'el-icon-lx-warn',
+                        index: '7',
+                        title: '错误处理',
+                        subs: [
+                            {
+                                index: 'permission',
+                                title: '权限测试'
+                            },
+                            {
+                                index: '404',
+                                title: '404页面'
+                            }
+                        ]
+                    },
+                    {
+                        icon: 'el-icon-lx-redpacket_fill',
+                        index: '/donate',
+                        title: '支持作者'
+                    }
+                ]
             };
         },
         computed: {
             username() {
                 let username = localStorage.getItem('user');
                 return username ? username : this.name;
+            },
+            onRoutes() {
+                return this.$route.path.replace('/', '');
             }
         },
         methods: {
