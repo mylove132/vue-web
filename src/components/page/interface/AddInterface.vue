@@ -6,7 +6,6 @@
                          style="background-color: white;height: 100vh;width: 100%;background-color: #f0f0f0" type="card" closable
                          @tab-remove="removeTab">
                     <el-tab-pane
-
                             v-for="(item, index) in editableTabs"
                             :key="item.name"
                             :label="item.title"
@@ -16,8 +15,9 @@
                     </el-tab-pane>
                 </el-tabs>
             </el-col>
+
             <el-col :span="4">
-                <el-button style="margin-top: 8px" type="primary" @click="addTab(editableTabsValue)" icon="el-icon-plus">新建</el-button>
+                <el-link icon="el-icon-plus" style="margin-left: -760px;color: #f07423;margin-top: 10px" @click="addTab(editableTabsValue)">编辑</el-link>
             </el-col>
         </el-row>
 
@@ -34,7 +34,7 @@
             return {
                 editableTabsValue: '1',
                 editableTabs: [{
-                    title: 'New Tba',
+                    title: 'New Tab',
                     name: '1',
                     content: InterfaceContent
                 }],
