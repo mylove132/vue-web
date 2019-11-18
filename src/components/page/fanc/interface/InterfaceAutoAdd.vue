@@ -656,6 +656,7 @@
                     value: ''
                 });
             },
+
             handleDel(index){
                 this.formInput.splice(index, 1)
             },

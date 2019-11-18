@@ -126,29 +126,39 @@
                         cancelButtonColor: '#d33',
                         confirmButtonText: 'Yes, delete it!'
                     }).then((result) => {
-                        _this.$del(_this.$api.catalogUrl+"/"+data.node.id).then(
-                            response => {
-                                if (response.code == 0){
-                                    data.instance.refresh();
-                                    swal(
-                                        'Deleted!',
-                                        'Your file has been deleted.',
-                                        'success'
-                                    )
-                                }else {
-                                    data.instance.refresh();
-                                    swal(
-                                        'Fail!',
-                                        '删除失败',
-                                        'error'
-                                    )
+                        if (result.value){
+                            _this.$del(_this.$api.catalogUrl+"/"+data.node.id).then(
+                                response => {
+                                    if (response.code == 0){
+                                        data.instance.refresh();
+                                        swal({
+                                                position: 'top-end',
+                                                type: 'success',
+                                                title: 'delete success',
+                                                showConfirmButton: false,
+                                                timer: 1500
+                                            }
+                                        )
+                                    }else {
+                                        data.instance.refresh();
+                                        swal({
+                                            position: 'top-end',
+                                            icon: 'error',
+                                            title: 'delete fail',
+                                            showConfirmButton: false,
+                                            timer: 1500
+                                        })
+                                    }
                                 }
-                            }
-                        ).catch(
-                            err => {
-                                data.instance.refresh();
-                            }
-                        )
+                            ).catch(
+                                err => {
+                                    data.instance.refresh();
+                                }
+                            )
+                        }else {
+                            data.instance.refresh();
+                        }
+
                     })
                 }
             ).on('rename_node.jstree', function (e, data) {
@@ -159,17 +169,23 @@
                 _this.$put(_this.$api.catalogUrl,_this.qs.stringify(param)).then(response => {
                     if (response.code == 0){
                         data.instance.refresh();
-                        swal(
-                            '修改成功!',
-                            'Your file has been update.',
-                            'success'
+                        swal({
+                                position: 'top-end',
+                                type: 'success',
+                                title: '修改成功',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }
                         )
                     }else {
                         data.instance.refresh();
-                        swal(
-                            'Fail!',
-                            '修改失败',
-                            'error'
+                        swal({
+                                position: 'top-end',
+                                type: 'error',
+                                title: '修改失败',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }
                         )
                     }
                 }).catch(
