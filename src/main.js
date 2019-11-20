@@ -15,8 +15,13 @@ import 'babel-polyfill';
 import QS from 'qs'
 import ViewUI from 'view-design';
 import layer from 'vue-layer'
+import VueHighLightJS from 'vue-highlight.js'
+import 'highlight.js/styles/atom-one-dark.css'
+import JSONView from 'vue-json-viewer'
+Vue.use(JSONView)
 
 
+Vue.use(VueHighLightJS)
 Vue.prototype.qs = QS;
 Vue.use(ViewUI)
 Vue.config.productionTip = false;
