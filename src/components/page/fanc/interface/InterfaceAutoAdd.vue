@@ -36,7 +36,7 @@
                                 placeholder="项目模块"
                                 :options="proList"
                                 :props="{ checkStrictly: true,value:'id',label:'name' }"
-                                v-model="ruleForm.moduleId"
+                                v-model="ruleForm.catalogId"
                                 @change="showEnv"
                                 clearable></el-cascader>
 

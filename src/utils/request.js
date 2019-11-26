@@ -70,6 +70,7 @@ const errorHandle = (status, other) => {
 
 // 创建axios实例
 var instance = axios.create({timeout: 1000 * 12});
+instance.defaults.baseURL = process.env.VUE_APP_BASEURL
 // 设置post请求头
 instance.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 /**
@@ -88,25 +89,97 @@ instance.interceptors.request.use(
     },
     error => Promise.error(error))
 
-// 响应拦截器
-instance.interceptors.response.use(
-    // 请求成功
-    res => res.status === 200 ? Promise.resolve(res) : Promise.reject(res),
-    // 请求失败
-    error => {
-        const { response } = error;
-        if (response) {
-            // 请求已发出，但是不在2xx的范围
-            errorHandle(response.status, response.data);
-            return Promise.reject(response);
+axios.interceptors.response.use(
+    response => {
+        // 如果返回的状态码为200，说明接口请求成功，可以正常拿到数据
+        // 否则的话抛出错误
+        if (response.status === 200) {
+            return Promise.resolve(response);
         } else {
-            // 处理断网的情况
-            // eg:请求超时或断网时，更新state的network状态
-            // network状态在app.vue中控制着一个全局的断网提示组件的显示隐藏
-            // 关于断网组件中的刷新重新获取数据，会在断网组件中说明
-            store.commit('changeNetwork', false);
+            return Promise.reject(response);
         }
-    });
+    },
+    // 服务器状态码不是2开头的的情况
+    // 这里可以跟你们的后台开发人员协商好统一的错误状态码
+    // 然后根据返回的状态码进行一些操作，例如登录过期提示，错误提示等等
+    // 下面列举几个常见的操作，其他需求可自行扩展
+    error => {
+        if (error.response.status) {
+            switch (error.response.status) {
+                // 401: 未登录
+                // 未登录则跳转登录页面，并携带当前页面的路径
+                // 在登录成功后返回当前页面，这一步需要在登录页操作。
+                case 401:
+                    toLogin();
+                    break;
+
+                // 403 token过期
+                // 登录过期对用户进行提示
+                // 清除本地token和清空vuex中token对象
+                // 跳转登录页面
+                case 403:
+                    if (error.response.data.message == "用户角色无权限"){
+                        swal({
+                            text:"用户角色无权限",
+                            type:"warning",
+                            timer: 1500
+                        })
+                        break;
+                    }else{
+                    swal({
+                        title:"登录状态失效，请重新登录",
+                        type: "warning",
+                        timer: 1500
+                    });
+                    store.dispatch('LogOut')
+                    window.location.href = "/login";
+                    break;
+                }
+                // 404请求不存在
+                case 404:
+                    swal({
+                        title:"请求资源不存在",
+                        type: "warning",
+                        timer: 1500
+                    });
+                    break;
+                // 其他错误，直接抛出错误提示
+                default:
+                    swal({
+                        title:error.response.data.message,
+                        type: "warning",
+                        timer: 2500
+                    });
+            }
+            return Promise.reject(error.response);
+        }
+    }
+)
+
+
+
+// // 响应拦截器
+// instance.interceptors.response.use(
+// // 请求成功
+//     res => {
+//         console.log(res)
+//         res.status === 200 ? Promise.resolve(res) : Promise.reject(res)
+//     },
+//     // 请求失败
+//     error => {
+//         const { response } = error;
+//         if (response) {
+//             // 请求已发出，但是不在2xx的范围
+//             errorHandle(response.status, response.data);
+//             return Promise.reject(response);
+//         } else {
+//             // 处理断网的情况
+//             // eg:请求超时或断网时，更新state的network状态
+//             // network状态在app.vue中控制着一个全局的断网提示组件的显示隐藏
+//             // 关于断网组件中的刷新重新获取数据，会在断网组件中说明
+//             store.commit('changeNetwork', false);
+//         }
+//     });
 
 /**
  * 封装get方法
@@ -115,19 +188,16 @@ instance.interceptors.response.use(
  * @returns {Promise}
  */
 
-export function fetch(url,params={},headers){
-    return new Promise((resolve,reject) => {
-        instance.get(url,{
-            params:params
-        },headers)
-            .then(response => {
-                resolve(response.data);
-            })
-            .catch(err => {
-                reject(err)
-            })
-    })
-}
+export function fetch(url, params){
+    return new Promise((resolve, reject) =>{
+        axios.get(url, {
+            params: params
+        }).then(res => {
+            resolve(res.data);
+        }).catch(err =>{
+            reject(err.data)
+        })
+    });}
 
 /**
  * 封装del方法

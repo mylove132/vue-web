@@ -1,8 +1,8 @@
 <template>
     <div class="header">
-        <div class="logo" style="margin-left: 20px">后台管理系统</div>
+        <div class="logo" style="margin-left: 20px">blingABC自动化平台</div>
         <div>
-            <div style="float: left">
+            <div style="float: left;margin-left: 120px">
                 <el-menu
                         :default-active="onRoutes"
                         background-color="#545c64"
@@ -51,7 +51,7 @@
                 </el-menu>
             </div>
         </div>
-        <div class="header-right">
+        <div class="header-right" style="margin-right: 50px">
             <div class="header-user-con">
                 <!-- 全屏显示 -->
                 <div class="btn-fullscreen" @click="handleFullScreen">
@@ -94,7 +94,7 @@
     </div>
 </template>
 <script>
-    import bus from '../common/bus';
+    import Bus from '../Bus';
     export default {
         data() {
             return {

@@ -13,17 +13,17 @@ import './assets/css/icon.css';
 import './components/common/directives';
 import 'babel-polyfill';
 import QS from 'qs'
-import ViewUI from 'view-design';
-import layer from 'vue-layer'
-import VueHighLightJS from 'vue-highlight.js'
-import 'highlight.js/styles/atom-one-dark.css'
+// import ViewUI from 'view-design';
+import Highlight from './utils/highlight'; // from 路径是highlight.js的路径，纯属自定义
+Vue.use(Highlight);
 import JSONView from 'vue-json-viewer'
 Vue.use(JSONView)
+import VueClipboard from 'vue-clipboard2'
+Vue.use(VueClipboard)
 
 
-Vue.use(VueHighLightJS)
 Vue.prototype.qs = QS;
-Vue.use(ViewUI)
+// Vue.use(ViewUI)
 Vue.config.productionTip = false;
 Vue.prototype.$api=api;
 Vue.prototype.$fetch=fetch;
@@ -31,7 +31,6 @@ Vue.prototype.$post=post;
 Vue.prototype.$put=put;
 Vue.prototype.$del=del;
 Vue.prototype.$patch=patch;
-Vue.prototype.$layer = layer(Vue);
 
 Vue.use(VueI18n);
 Vue.use(ElementUI, {

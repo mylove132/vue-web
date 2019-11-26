@@ -8,7 +8,7 @@
                     <el-tab-pane label="Collections" name="collections">
                         <InterfacePage></InterfacePage>
                     </el-tab-pane>
-                    <el-tab-pane label="Task" name="task"></el-tab-pane>
+                    <el-tab-pane label="Monitor" name="monitor"></el-tab-pane>
                 </el-tabs>
             </el-col>
             <el-col :span="6" style="margin-left: 10px">

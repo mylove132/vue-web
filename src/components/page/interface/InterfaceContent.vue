@@ -1,10 +1,11 @@
 <template>
-    <div style="height: 50vh;overflow-y: auto">
+    <div style="overflow-y: auto">
         <el-row>
             <el-col :span="16">
                 <el-input v-model="url" size="medium" class="input-with-select"
                           style="width: 95%;height:42px;border-radius: 5px;margin-left:8px;">
-                    <el-select v-model="request_way_id" id="requestWay" slot="prepend" style="width: 120px" placeholder="请选择">
+                    <el-select v-model="request_way_id" id="requestWay" slot="prepend" style="width: 120px"
+                               placeholder="请选择">
                         <el-option
                                 v-for="item in request_way"
                                 :key="item.id"
@@ -17,14 +18,18 @@
             <el-col :span="2">
                 <el-button
                         style="background-color: #097bed;margin-left:2px;color: white;margin-top: 3px;width: 80px;height:38px;border-radius: 5px;"
+                        v-loading.fullscreen.lock="loadRunTest"
                         @click="runTest">Send
                 </el-button>
             </el-col>
             <el-col :span="2">
-                <el-button
-                        style="background-color: #f47023;margin-left:16px;color: white;margin-top: 3px;width: 80px;height:38px;border-radius: 5px;border: #ff4b00 1px solid"
-                        @click="save">Save<i class="el-icon-download el-icon--right"></i></el-button>
-            </el-col>
+            <el-button
+                    style="background-color: #f47023;margin-left:16px;color: white;margin-top: 3px;width: 80px;height:38px;border-radius: 5px;border: #ff4b00 1px solid"
+                    @click="save">Save<i class="el-icon-download el-icon--right"></i></el-button>
+        </el-col>
+            <el-dialog title="接口保存" :visible.sync="dialogTableVisible" center :append-to-body='true' :lock-scroll="false" width="30%" style="">
+                <save-collection v-bind:saveData="saveObj" @saveCatalogResult="getChildSaveResult"></save-collection>
+            </el-dialog>
         </el-row>
         <el-row style="margin-top: 20px;margin-left: 10px">
             <el-tabs v-model="activeName">
@@ -34,7 +39,7 @@
                                   style="width: 100%;">
                             <el-table-column prop="name" label="Key">
                                 <template slot-scope="scope">
-                                    <el-input v-model="scope.row.name" placeholder="key" v-on:focus="addInput">
+                                    <el-input v-model="scope.row.name" placeholder="key" v-on:blur="addInput(scope)">
                                     </el-input>
                                 </template>
                             </el-table-column>
@@ -58,7 +63,7 @@
                         </el-table>
                     </el-row>
                 </el-tab-pane>
-                <el-tab-pane label="Body" name="body" :disabled="request_way_id === 1">
+                <el-tab-pane label="Body" name="body" :disabled="request_way_id === 1 || request_way_id == ''">
                     <el-row style="margin-left: 0px">
                         <el-tabs v-model="paramActiveName">
                             <el-tab-pane label="JSON" name="json">
@@ -72,12 +77,15 @@
 
                             </el-tab-pane>
                             <el-tab-pane label="FORM-DATA" name="form">
+                                <el-button type="primary" v-if="isform" round style="float: right;margin-right: 10px;margin-bottom: 5px" @click="isform=false">Buld Edit</el-button>
+                                <el-button type="success" v-else="isform" @click="covertFanc" round style="float: right;margin-right: 10px;margin-bottom: 5px">Key-Value Edit</el-button>
                                 <el-table :data="paramInput" border stripe highlight-current-row
+                                          v-if="isform"
                                           style="width: 100%;">
                                     <el-table-column prop="name" label="Key">
                                         <template slot-scope="scope">
                                             <el-input v-model="scope.row.name" placeholder="key"
-                                                      v-on:focus="addParamInput">
+                                                      v-on:blur="addParamInput(scope)">
                                             </el-input>
                                         </template>
                                     </el-table-column>
@@ -99,6 +107,13 @@
                                         </template>
                                     </el-table-column>
                                 </el-table>
+                                <el-input
+                                        type="textarea"
+                                        :rows="13"
+                                        placeholder="请输入内容"
+                                        v-else="isform"
+                                        v-model="covertParam">
+                                </el-input>
                             </el-tab-pane>
                         </el-tabs>
                     </el-row>
@@ -110,18 +125,24 @@
 
 <script>
     import swal from 'sweetalert2';
+    import SaveCollection from '../collections/SaveCollection';
 
     export default {
         name: 'InterfaceContent',
+        components: { SaveCollection },
         data() {
             return {
+                isform:true,
+                covertParam:'',
                 url: '',
                 request_way: [],
                 request_way_id: '',
                 isShowBody: false,
                 activeName: 'header',
                 paramActiveName: 'form',
+                dialogTableVisible:false,
                 jsonParam: '',
+                loadRunTest:false,
                 headerInput: [{
                     name: '',
                     value: ''
@@ -129,10 +150,12 @@
                 paramInput: [{
                     name: '',
                     value: ''
-                }]
+                }],
+                saveObj:{}
             };
         },
-        props: {},
+        props: [
+        ],
         created() {
             this.$fetch(this.$api.request_way_url).then(
                 response => {
@@ -141,23 +164,30 @@
             );
         },
         methods: {
-            handleHeaderAdd() {
+            covertFanc(){
+                this.paramInput = this.covertParam.split('\n').map(v=>{ let arr = v.match(/([^:\s]+):\s?(.*)/i); return { name: arr[1], value: arr[2]}});
+                this.isform = false;
             },
-            handleHeadereDel(index) {
+            getChildSaveResult(data){
+                this.dialogTableVisible = !data;
             },
-            clearHeader() {
+            addInput(scope) {
+                console.log(scope);
+                if (scope.row.name != '') {
+                    this.headerInput.push({
+                        name: '',
+                        value: ''
+                    });
+                }
             },
-            addInput() {
-                this.headerInput.push({
-                    name: '',
-                    value: ''
-                });
-            },
-            addParamInput() {
-                this.paramInput.push({
-                    name: '',
-                    value: ''
-                });
+            addParamInput(scope) {
+                if (scope.row.name != '') {
+                    this.paramInput.push({
+                        name: '',
+                        value: ''
+                    });
+                }
+
             },
             delRow(index, rows) {
                 rows.splice(index, 1);
@@ -173,77 +203,107 @@
                         }
                     );
                     return;
+                }
+                let paramType = null;
+                if ($('#requestWay').val() == 'get') {
+                    paramType = null;
                 } else {
-                    let jy = this.fIsUrL(this.url);
-                    if (!jy) {
-                        swal({
-                                position: 'center',
-                                type: 'warning',
-                                title: 'url格式不正常',
-                                showConfirmButton: false,
-                                timer: 1500
-                            }
-                        );
-                        return;
-                    }
+                    paramType = this.paramActiveName == 'json' ? 'json' : 'form';
                 }
                 let headerObj = {};
-                this.headerInput.map(function(e,item) {
-                    if (e.name != "" && e.name != null){
+                this.headerInput.map(function(e, item) {
+                    if (e.name != '' && e.name != null) {
                         headerObj[e.name] = e.value;
                     }
 
                 });
                 let paramObj = {};
-                this.paramInput.map(function(e,item) {
-                    if (e.name != "" && e.name != null){
-                        paramObj[e.name] = e.value;
-                    }
-
-                });
+                if (this.request_way_id == 1 || this.request_way_id == '') {
+                    paramObj = null;
+                } else {
+                    this.paramInput.map(function(e, item) {
+                        if (e.name != '' && e.name != null) {
+                            paramObj[e.name] = e.value;
+                        }
+                    });
+                }
+                let par = '';
+                if (paramType == 'json'){
+                    par = this.jsonParam;
+                }else {
+                    par = JSON.stringify(paramObj);
+                }
+                this.loadRunTest = true;
                 this.$post(this.$api.run_interface_url, this.qs.stringify({
                     url: this.url,
                     header: JSON.stringify(headerObj),
-                    param: paramObj,
-                    requestWay: $("#requestWay").val(),
-                    paramType: 'form'
+                    param: par,
+                    requestWay: $('#requestWay').val(),
+                    paramType: paramType
                 })).then(
                     response => {
-                        this.$emit('getChildResult', response.result);
-                    }
-                ).catch(
-                    err => {
-                        console.log('运行接口失败:' + err.message);
-                        swal({
-                                position: 'top-end',
-                                type: 'error',
-                                title: '请求失败',
-                                showConfirmButton: false,
-                                timer: 1500
+                        this.loadRunTest = false;
+                        if (typeof (response.result.result) == 'string') {
+                            try {
+                                let res = JSON.parse(response.result.result);
+                                this.$emit('getChildResult', res);
+                            } catch (e) {
+                                this.$emit('getChildResult', response.result);
                             }
-                        );
+                        }
+
                     }
                 );
             },
             save() {
-            },
-            fIsUrL(str_url) {
-                var strRegex = '^((https|http|ftp|rtsp|mms)?://)'
-                    + '?(([0-9a-z_!~*\'().&=+$%-]+: )?[0-9a-z_!~*\'().&=+$%-]+@)?' //ftp的user@
-                    + '(([0-9]{1,3}.){3}[0-9]{1,3}' // IP形式的URL- 199.194.52.184
-                    + '|' // 允许IP和DOMAIN（域名）
-                    + '([0-9a-z_!~*\'()-]+.)*' // 域名- www.
-                    + '([0-9a-z][0-9a-z-]{0,61})?[0-9a-z].' // 二级域名
-                    + '[a-z]{2,6})' // first level domain- .com or .museum
-                    + '(:[0-9]{1,4})?' // 端口- :80
-                    + '((/?)|' // a slash isn't required if there is no file name
-                    + '(/[0-9a-z_!~*\'().;?:@&=+$,%#-]+)+/?)$';
-                var re = new RegExp(strRegex);
-                if (re.test(str_url)) {
-                    return (true);
-                } else {
-                    return (false);
+                if (this.url == ''){
+                    swal({
+                            position: 'center',
+                            type: 'warning',
+                            title: 'url不能为空',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }
+                    );
+                    return;
+                }else {
+                    this.saveObj.url = this.url;
                 }
+                let paramType = null;
+                if ($('#requestWay').val() == 'get') {
+                    paramType = null;
+                } else {
+                    paramType = this.paramActiveName == 'json' ? 'json' : 'form';
+                }
+                this.saveObj.paramType = paramType;
+
+                let headerObj = {};
+                this.headerInput.map(function(e, item) {
+                    if (e.name != '' && e.name != null) {
+                        headerObj[e.name] = e.value;
+                    }
+
+                });
+                this.saveObj.header = JSON.stringify(headerObj);
+
+                let paramObj = {};
+                if (this.request_way_id == 1 || this.request_way_id == '') {
+                    paramObj = null;
+                } else {
+                    this.paramInput.map(function(e, item) {
+                        if (e.name != '' && e.name != null) {
+                            paramObj[e.name] = e.value;
+                        }
+                    });
+                }
+                let par = '';
+                if (paramType == 'json'){
+                    par = this.jsonParam;
+                }else {
+                    par = JSON.stringify(paramObj);
+                }
+                this.saveObj.param = par;
+                this.dialogTableVisible = true;
             }
         }
     };
