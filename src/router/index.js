@@ -36,17 +36,12 @@ export default new Router({
                 },
                 {
                     path: '/interfaceauto',
-                    component: () => import(/* webpackChunkName: "form" */ '../components/page/fanc/interface/InterfaceAuto.vue'),
+                    component: () => import(/* webpackChunkName: "form" */ '../components/page/interface/InterfaceAuto.vue'),
                     meta: { title: '接口自动化用例' }
                 },
                 {
-                    path: '/webauto',
-                    component: () => import(/* webpackChunkName: "form" */ '../components/page/fanc/web/WebViewAdd.vue'),
-                    meta: { title: 'web UI自动化用例' }
-                },
-                {
                     path: '/interfaceauto_add',
-                    component: () => import(/* webpackChunkName: "form" */ '../components/page/fanc/interface/InterfaceAutoAdd.vue'),
+                    component: () => import(/* webpackChunkName: "form" */ '../components/page/interface/InterfaceAutoAdd.vue'),
                     meta: { title: '添加接口自动化用例' }
                 },
                 {

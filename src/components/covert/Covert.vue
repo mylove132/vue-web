@@ -1,7 +1,7 @@
 <template>
     <div id="covert" style="height: 100vh;background: #f4f4f4">
         <el-row style="margin-left: 20px;height: 30px;">
-       Language：<el-select v-model="value" placeholder="请选择" @change="covertLanguage">
+       Language：<el-select v-model="language" placeholder="请选择" @change="covertLanguage">
             <el-option
                     v-for="item in options"
                     :key="item.value"
@@ -21,12 +21,12 @@
                         v-clipboard:error="copyError">Copy</el-button>
             </div>
             <div style="clear:both">
-                <pre v-highlight><code v-html="code" class="java"></code></pre>
+                <pre v-highlight><code v-html="code" :class="lg"></code></pre>
             </div>
         </el-dialog>
         <el-row style="margin-top: 50px">
             <div @click="test">
-                <pre v-highlight><code v-html="code" class="java"></code></pre>
+                <pre v-highlight><code v-html="code" :class="lg"></code></pre>
             </div>
         </el-row>
     </div>
@@ -39,11 +39,20 @@
         data(){
             return{
                 options: [{
-                    value: '1',
-                    label: 'Curl'
-                }],
+                    value: '0',
+                    label: 'java'
+                },
+                    {
+                        value: '1',
+                        label: 'python'
+                    },
+                    {
+                        value: '2',
+                        label: 'shell'
+                    }],
+                lg:'',
                 dialogTableVisible:false,
-                value: '',
+                language: '',
                 content:'',
                 code:"package com.blingabc.auto.controller;\n" +
                     "\n" +
@@ -84,8 +93,15 @@
             }
         },
         methods:{
-            covertLanguage(){
-
+            covertLanguage(val){
+                this.options.forEach(
+                    item => {
+                        if (item.value == val){
+                            this.lg = item.label;
+                        }
+                    }
+                );
+                console.log(this.lg)
             },
             test(){
                 this.dialogTableVisible = true;

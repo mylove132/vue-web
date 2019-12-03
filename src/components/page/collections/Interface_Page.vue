@@ -2,7 +2,7 @@
     <div>
         <el-row style="height: 5vh;border-radius: 5px;">
             <div style="height: 60px;background: #e8e8e8;width: 100%" v-if="isSearch">
-                <el-button type="primary" icon="el-icon-folder-add" size="medium" style="float:right;margin-top: 10px;margin-right: 10px;font-size: 20px"  circle></el-button>
+                <el-button type="primary" icon="el-icon-folder-add" size="medium" class="add_btn"  circle></el-button>
                 <el-button type="primary" icon="el-icon-search" size="medium" @click="seachDir" style="float:right;margin-top: 10px;margin-right: 20px;font-size: 20px" circle></el-button>
 
             </div>
@@ -50,7 +50,7 @@
                 isSearch:true,
                 searchText:'',
                 userList:[],
-                caseList:[],
+                caseList:{},
                 envList:{},
                 dialogTableVisible:false,
                 ruleForm:{
@@ -214,11 +214,12 @@
                         }
                     )
                 }).on('select_node.jstree', function (e, data) {
-                    _this.$fetch(_this.$api.interface_case_url+"?catalogId="+data.node.id).then(
+                    _this.$fetch(_this.$api.case_url+"?catalogId="+data.node.id).then(
                         response => {
                             if (response.code == 0){
-                                _this.caseList = response.result.list;
+                                _this.caseList = response.result;
                                 Bus.$emit('caseList',_this.caseList);
+                                localStorage.setItem("catalogId",data.node.id);
                             }else {
                                 swal({
                                     position: 'center',
@@ -303,5 +304,7 @@
 </script>
 
 <style scoped>
-
+.add_btn{
+    float:right;margin-top: 10px;margin-right: 10px;font-size: 20px
+}
 </style>

@@ -13,6 +13,23 @@
                     <el-cascader  v-model="ruleForm.catalog" :options="catalogList"
                                   :props="{ checkStrictly: true,value:'id',label:'text' }" clearable></el-cascader>
             </el-form-item>
+            <el-form-item label="断言" prop="assert">
+                <el-row>
+                    <el-col :span="10">
+                        <el-select v-model="ruleForm.assert" placeholder="请选择断言类型" @change="selectAssert">
+                            <el-option v-for="item in assertTypeList" :label="item.type" :value="item.id"></el-option>
+                        </el-select>
+                    </el-col>
+                    <el-col :span="7">
+                        <el-input v-model="ruleForm.assert_name" v-show="ruleForm.assert > 0" style="margin-left: -6px" placeholder="请输入断言名称"></el-input>
+                    </el-col>
+                    <el-col :span="7">
+                        <el-input v-model="ruleForm.assert_val" v-show="ruleForm.assert > 0" style="margin-left: 5px" placeholder="请输入断言内容"></el-input>
+                    </el-col>
+                </el-row>
+
+
+            </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="submitForm('ruleForm')">立即保存</el-button>
                 <el-button @click="resetForm('ruleForm')">重置</el-button>
@@ -29,12 +46,15 @@
             return{
                 saveResult:false,
                 catalogList:[],
+                assertTypeList:[],
                 envList:[],
                 ruleForm:{
                     name:'',
                     env:'',
                     catalog:'',
-
+                    assert:'',
+                    assert_name:'',
+                    assert_val:''
                 },
                 rules:{
                     name: [
@@ -45,6 +65,15 @@
                     ],
                     catalog: [
                         { required: true, message: '请选择保存目录', trigger: 'change' }
+                    ],
+                    assert: [
+                        { required: true, message: '请选择断言类型', trigger: 'change' }
+                    ],
+                    assert_name: [
+                        { required: true, message: '请输入断言名称', trigger: 'blur' }
+                    ],
+                    assert_val: [
+                        { required: true, message: '请输入断言内容', trigger: 'blur' }
                     ],
                 }
             }
@@ -58,12 +87,24 @@
                         alert("获取环境目录失败")
                     }
                 }
+            );
+            this.$fetch(this.$api.assert_type_url).then(
+                response => {
+                    if (response.code == 0){
+                        this.assertTypeList = response.result;
+                    }else {
+                        alert("获取环境目录失败")
+                    }
+                }
             )
         },
         props:{
             saveData:{}
         },
         methods:{
+            selectAssert(val){
+
+            },
             selectEnv(){
                 this.$fetch(this.$api.catalogUrl+"?type=interface&userId=1&envId="+this.ruleForm.env).then(
                     response => {
@@ -83,13 +124,20 @@
                             let index = this.ruleForm.catalog.length;
                             catalogId = this.ruleForm.catalog[index-1];
                         }
+                        const assertVO = {
+                            name:this.ruleForm.assert_name,
+                            assertTypeId:this.ruleForm.assert,
+                            val:this.ruleForm.assert_val
+                        }
                         this.$post(this.$api.interface_case_url,this.qs.stringify({
                             name:this.ruleForm.name,
                             url:this.saveData.url,
                             catalogId:catalogId,
                             paramType:this.saveData.paramType,
                             param:this.saveData.param,
-                            header:this.saveData.header
+                            requestWayId:this.saveData.requestWayId,
+                            header:this.saveData.header,
+                            assertObj:JSON.stringify(assertVO)
                         })).then(
                             response => {
                                 if (response.code == 0){

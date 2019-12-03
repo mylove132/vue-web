@@ -2,12 +2,14 @@
     <div style="background: white;overflow-y: auto">
         <el-row>
             <el-col :span="5" style="height: 100vh;background: #f4f4f4;margin-left: 5px;box-shadow: 2px 0 5px -1px #cccccc;">
+                <el-row>
+                </el-row>
                 <el-tabs v-model="activeName" type="card" style="background-color: #f4f4f4;height: 100vh;">
                     <el-tab-pane label="History" name="history">
                     </el-tab-pane>
                     <el-tab-pane label="Collections" name="collections">
                         <el-row style="height: 30px;margin-bottom: 5px;">
-                            <el-select v-model="caseTypeId" clearable placeholder="请选择用例类型" style="width: 32%;margin-left: 2px" @change="queryCatalogList">
+                            <el-select v-model="caseTypeId" clearable placeholder="请选择用例类型" style="width: 32%;margin-left: 2px" @change="queryCatalogList" id="caseTypeId">
                                 <el-option
                                         v-for="item in caseTypeList"
                                         :key="item.id"
@@ -49,11 +51,11 @@
 </template>
 
 <script>
-    import Bus from '../../../Bus'
-    import InterfacePage from '../../collections/Interface_Page'
-    import AddInterface from '../../interface/AddInterface'
-    import Covert from '../../../covert/Covert'
-    import InterfaceListView from '../../interface/InterfaceListView';
+    import Bus from '../../Bus'
+    import InterfacePage from '../collections/Interface_Page'
+    import AddInterface from './AddInterface'
+    import Covert from '../../covert/Covert'
+    import InterfaceListView from './InterfaceListView';
     export default {
         name: 'interfaceauto',
         data() {
@@ -70,7 +72,7 @@
             };
         },
         created(){
-            this.$fetch(this.$api.case_type__url).then(response => {
+            this.$fetch(this.$api.case_type_url).then(response => {
                 this.caseTypeList = response.result
             });
             this.$fetch(this.$api.env_url).then(response => {

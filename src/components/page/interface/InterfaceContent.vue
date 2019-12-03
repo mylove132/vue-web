@@ -112,7 +112,7 @@
                                         :rows="13"
                                         placeholder="请输入内容"
                                         v-else="isform"
-                                        v-model="covertParam">
+                                        v-model="textParam">
                                 </el-input>
                             </el-tab-pane>
                         </el-tabs>
@@ -133,10 +133,10 @@
         data() {
             return {
                 isform:true,
-                covertParam:'',
+                textParam:'',
                 url: '',
                 request_way: [],
-                request_way_id: '',
+                request_way_id: 1,
                 isShowBody: false,
                 activeName: 'header',
                 paramActiveName: 'form',
@@ -165,8 +165,14 @@
         },
         methods: {
             covertFanc(){
-                this.paramInput = this.covertParam.split('\n').map(v=>{ let arr = v.match(/([^:\s]+):\s?(.*)/i); return { name: arr[1], value: arr[2]}});
-                this.isform = false;
+                console.log(this.textParam)
+                try{
+                    this.paramInput = this.textParam.split('\n').map(v=>{ let arr = v.match(/([^:\s]+):\s?(.*)/i); return { name: arr[1], value: arr[2]}});
+                    this.isform = true;
+                }catch (e) {
+                    this.isform = true;
+                }
+
             },
             getChildSaveResult(data){
                 this.dialogTableVisible = !data;
@@ -269,6 +275,7 @@
                 }else {
                     this.saveObj.url = this.url;
                 }
+                this.saveObj.requestWayId = this.request_way_id;
                 let paramType = null;
                 if ($('#requestWay').val() == 'get') {
                     paramType = null;

@@ -1,12 +1,10 @@
 <template>
-    <div>
-        环境变量配置
-    </div>
+    
 </template>
 
 <script>
     export default {
-        name: 'EnvVariable'
+        name: 'AddWebCaseView'
     };
 </script>
 
